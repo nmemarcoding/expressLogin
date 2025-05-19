@@ -5,12 +5,11 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import HomePage from './pages/HomePage';
 import Navbar from './components/Navbar';
-import './App.css';
 
-// Loading component
+// Loading component with Tailwind classes instead of CSS
 const LoadingScreen = () => (
-  <div className="loading-container">
-    <div className="loading-spinner"></div>
+  <div className="flex items-center justify-center flex-col h-screen w-full">
+    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
     <p>Loading...</p>
   </div>
 );
