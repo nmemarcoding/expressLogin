@@ -10,7 +10,15 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+
+// CORS configuration - fixed to allow credentials with specific origin
+app.use(cors({
+  origin: 'http://localhost:3000', // Frontend origin
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['x-auth-token']
+}));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
