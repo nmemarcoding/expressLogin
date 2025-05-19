@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { publicRequest, setAuthToken, setUserInfo } from '../utils/requestMethods';
 
-const Login = () => {
+const Login = ({ checkAuth }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,13 +27,21 @@ const Login = () => {
       setAuthToken(token);
       setUserInfo(user);
       
-      // Redirect to home/dashboard
-      navigate('/');
+      console.log('Login successful, redirecting to home page...');
+      
+      // Update authentication state in parent component
+      if (checkAuth) checkAuth();
+      
+      // Redirect to home page with a slight delay to allow state update
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
     } catch (err) {
       const errorMessage = err.response?.data?.message || 
                           err.response?.data?.error || 
                           'An error occurred during login. Please try again.';
       setError(errorMessage);
+      console.error('Login error:', err);
     } finally {
       setLoading(false);
     }

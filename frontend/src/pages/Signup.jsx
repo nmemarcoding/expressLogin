@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { publicRequest, setAuthToken, setUserInfo } from '../utils/requestMethods';
 
-const Signup = () => {
+const Signup = ({ checkAuth }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -32,13 +32,21 @@ const Signup = () => {
       setAuthToken(token);
       setUserInfo(user);
       
-      // Redirect to home/dashboard
-      navigate('/');
+      console.log('Signup successful, redirecting to home page...');
+      
+      // Update authentication state in parent component
+      if (checkAuth) checkAuth();
+      
+      // Redirect to home page with a slight delay to allow state update
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
     } catch (err) {
       const errorMessage = err.response?.data?.message || 
                           err.response?.data?.error || 
                           'An error occurred during signup. Please try again.';
       setError(errorMessage);
+      console.error('Signup error:', err);
     } finally {
       setLoading(false);
     }
