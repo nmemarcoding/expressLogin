@@ -7,7 +7,7 @@ const TOKEN_COOKIE_NAME = 'auth_token';
 
 export const setAuthToken = (token) => {
   if (!token) return;
-  Cookies.set(TOKEN_COOKIE_NAME, token, { expires: 7 }); // stored for 7 days
+  Cookies.set(TOKEN_COOKIE_NAME, token, { expires: 7 });
 };
 
 export const setUserInfo = (userData) => {
@@ -24,7 +24,6 @@ export const removeUserInfo = () => localStorage.removeItem('user');
 export const getAuthToken = () => Cookies.get(TOKEN_COOKIE_NAME);
 export const removeAuthToken = () => Cookies.remove(TOKEN_COOKIE_NAME);
 
-// Axios instance for authenticated requests
 export const publicRequest = () => {
   const token = getAuthToken();
 
@@ -37,7 +36,6 @@ export const publicRequest = () => {
     }
   });
 
-  // Add token to each request if exists
   instance.interceptors.request.use(
     (config) => {
       const currentToken = getAuthToken();
@@ -49,16 +47,15 @@ export const publicRequest = () => {
     (error) => Promise.reject(error)
   );
 
-  // Handle token from responses & unauthorized access
   instance.interceptors.response.use(
     (response) => {
       const token = response.headers['x-auth-token'] || response.data?.token || response.data?.accessToken;
-      if (token) setAuthToken(token); // update token if new one is received
+      if (token) setAuthToken(token);
       return response;
     },
     (error) => {
       if (error.response?.status === 401) {
-        removeAuthToken(); // unauthorized - remove token
+        removeAuthToken();
       }
       return Promise.reject(error);
     }

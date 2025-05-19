@@ -1,36 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUserInfo, removeAuthToken, removeUserInfo } from '../utils/requestMethods';
-import Navbar from '../components/Navbar';
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Use useCallback to memoize the navigation function
   const handleLogout = useCallback(() => {
-    // Clear authentication data
     removeAuthToken();
     removeUserInfo();
-    console.log("User logged out");
-    // Redirect to login with replace to avoid adding to history stack
     navigate('/login', { replace: true });
   }, [navigate]);
 
   useEffect(() => {
     let isMounted = true;
     
-    // Get user information from local storage on component mount
     const checkUserAuth = async () => {
       try {
         const userInfo = getUserInfo();
         if (userInfo && isMounted) {
           setUser(userInfo);
-          console.log("HomePage loaded with user:", userInfo);
         } else if (isMounted) {
-          console.log("No user info found, redirecting to login");
-          // Use replace to avoid adding to history stack
           navigate('/login', { replace: true });
         }
       } catch (error) {
@@ -42,12 +33,10 @@ const HomePage = () => {
       }
     };
     
-    // Add a small timeout to prevent rapid navigation
     const timeoutId = setTimeout(() => {
       checkUserAuth();
     }, 100);
     
-    // Cleanup function to prevent state updates after unmount
     return () => {
       isMounted = false;
       clearTimeout(timeoutId);
@@ -64,10 +53,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-     
-      
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {/* Page header */}
         <div className="px-4 py-6 sm:px-0">
           <div className="border-4 border-dashed border-gray-200 rounded-lg bg-white p-6 shadow-sm">
             <h1 className="text-2xl font-bold text-gray-800">Welcome, {user.firstName}!</h1>
@@ -76,7 +62,6 @@ const HomePage = () => {
             </p>
             
             <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {/* Dashboard card examples */}
               <div className="bg-indigo-50 overflow-hidden shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <h3 className="text-lg font-medium text-indigo-800">Profile Information</h3>

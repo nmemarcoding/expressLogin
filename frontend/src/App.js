@@ -19,13 +19,9 @@ const LoadingScreen = () => (
 const AppContent = () => {
   const navigate = useNavigate();
   
-  // Logout function that can be passed to components
   const handleLogout = useCallback(() => {
-    // Clear authentication data
     removeAuthToken();
     removeUserInfo();
-    console.log("User logged out");
-    // Redirect to login with replace to avoid adding to history stack
     navigate('/login', { replace: true });
   }, [navigate]);
   
@@ -35,28 +31,26 @@ const AppContent = () => {
     const [isAuth, setIsAuth] = useState(false);
 
     useEffect(() => {
-        const token = getAuthToken();
-        setIsAuth(!!token);
-        setIsChecking(false);
+      const token = getAuthToken();
+      setIsAuth(!!token);
+      setIsChecking(false);
     }, []);
 
     if (isChecking) {
-        return <LoadingScreen />;
+      return <LoadingScreen />;
     }
 
     if (!isAuth) {
-        return <Navigate to="/login" />;
+      return <Navigate to="/login" />;
     }
 
-    // Return the children wrapped with Navbar for authenticated routes
     return (
-        <>
-            <Navbar onLogout={handleLogout} />
-            {/* Add top padding to account for fixed navbar height */}
-            <div className="pt-14 md:pt-16">
-                {children}
-            </div>
-        </>
+      <>
+        <Navbar onLogout={handleLogout} />
+        <div className="pt-14 md:pt-16">
+          {children}
+        </div>
+      </>
     );
   };
 
@@ -65,7 +59,7 @@ const AppContent = () => {
     const isAuthenticated = !!getAuthToken();
     
     if (isAuthenticated) {
-        return <Navigate to="/" />;
+      return <Navigate to="/" />;
     }
     
     return children;
@@ -74,57 +68,57 @@ const AppContent = () => {
   return (
     <Routes>
       <Route 
-          path="/" 
-          element={
-              <ProtectedRoute>
-                  <HomePage />
-              </ProtectedRoute>
-          } 
+        path="/" 
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        } 
       />
       
-      {/* Profile route */}
       <Route
-          path="/profile"
-          element={
-              <ProtectedRoute>
-                  <HomePage />
-              </ProtectedRoute>
-          }
-      />
-      <Route
-          path="/profile/:username"
-          element={
-              <ProtectedRoute>
-                  <HomePage />
-              </ProtectedRoute>
-          }
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
       />
       
-      {/* Find Friends route */}
       <Route
-          path="/find-friends"
-          element={
-              <ProtectedRoute>
-                  <HomePage />
-              </ProtectedRoute>
-          }
+        path="/profile/:username"
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/find-friends"
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
       />
       
       <Route 
-          path="/login" 
-          element={
-              <AuthRoute>
-                  <Login />
-              </AuthRoute>
-          } 
+        path="/login" 
+        element={
+          <AuthRoute>
+            <Login />
+          </AuthRoute>
+        } 
       />
+      
       <Route 
-          path="/signup" 
-          element={
-              <AuthRoute>
-                  <Signup />
-              </AuthRoute>
-          } 
+        path="/signup" 
+        element={
+          <AuthRoute>
+            <Signup />
+          </AuthRoute>
+        } 
       />
 
       <Route path="*" element={<Navigate to="/" />} />

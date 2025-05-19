@@ -34,7 +34,6 @@ const Navbar = memo(({ onLogout }) => {
     <nav className="bg-indigo-600 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          {/* Brand + Nav Links */}
           <div className="flex items-center">
             <Link to="/" className="text-white text-xl font-bold">
               MyApp
@@ -52,7 +51,6 @@ const Navbar = memo(({ onLogout }) => {
             </div>
           </div>
 
-          {/* Desktop User Info + Logout */}
           <div className="hidden sm:flex items-center space-x-4">
             <span className="text-sm text-white">
               {user && `${user.firstName} ${user.lastName}`}
@@ -65,7 +63,6 @@ const Navbar = memo(({ onLogout }) => {
             </button>
           </div>
 
-          {/* Mobile menu toggle */}
           <div className="sm:hidden">
             <button
               onClick={toggleMenu}
@@ -85,7 +82,6 @@ const Navbar = memo(({ onLogout }) => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div className="sm:hidden bg-indigo-600 px-4 pt-2 pb-4 space-y-1">
           <Link to="/" className="block text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-base font-medium">

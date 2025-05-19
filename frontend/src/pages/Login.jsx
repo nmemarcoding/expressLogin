@@ -11,7 +11,7 @@ const Login = ({ checkAuth }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    setError(''); // Clear error when user types
+    setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -23,25 +23,19 @@ const Login = ({ checkAuth }) => {
       const response = await publicRequest().post('auth/login', formData);
       const { token, user } = response.data;
       
-      // Store authentication data
       setAuthToken(token);
       setUserInfo(user);
       
-      console.log('Login successful, redirecting to home page...');
-      
-      // Update authentication state in parent component
       if (checkAuth) checkAuth();
       
-      // Redirect to home page with a slight delay to allow state update
       setTimeout(() => {
         navigate('/', { replace: true });
       }, 100);
     } catch (err) {
       const errorMessage = err.response?.data?.message || 
-                          err.response?.data?.error || 
-                          'An error occurred during login. Please try again.';
+                         err.response?.data?.error || 
+                         'An error occurred during login. Please try again.';
       setError(errorMessage);
-      console.error('Login error:', err);
     } finally {
       setLoading(false);
     }

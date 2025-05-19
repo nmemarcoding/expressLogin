@@ -16,7 +16,7 @@ const Signup = ({ checkAuth }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    setError(''); // Clear error when user types
+    setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -28,16 +28,11 @@ const Signup = ({ checkAuth }) => {
       const response = await publicRequest().post('auth/register', formData);
       const { token, user } = response.data;
       
-      // Store authentication data
       setAuthToken(token);
       setUserInfo(user);
       
-      console.log('Signup successful, redirecting to home page...');
-      
-      // Update authentication state in parent component
       if (checkAuth) checkAuth();
       
-      // Redirect to home page with a slight delay to allow state update
       setTimeout(() => {
         navigate('/', { replace: true });
       }, 100);
@@ -46,7 +41,6 @@ const Signup = ({ checkAuth }) => {
                           err.response?.data?.error || 
                           'An error occurred during signup. Please try again.';
       setError(errorMessage);
-      console.error('Signup error:', err);
     } finally {
       setLoading(false);
     }
