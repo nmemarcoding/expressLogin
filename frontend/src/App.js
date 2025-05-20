@@ -1,136 +1,93 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
-import { getAuthToken, removeAuthToken, removeUserInfo } from './utils/requestMethods';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { getAuthToken } from './hooks/requestMethods';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import HomePage from './pages/HomePage';
-import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
+import './App.css';
 
-// Loading component with Tailwind classes instead of CSS
+// Loading component
 const LoadingScreen = () => (
-  <div className="flex items-center justify-center flex-col h-screen w-full">
-    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-    <p>Loading...</p>
+  <div className="flex flex-col items-center justify-center h-screen w-full bg-white bg-opacity-90">
+    <div className="w-12 h-12 rounded-full border-4 border-gray-200 border-t-indigo-600 animate-spin mb-4"></div>
+    <p className="text-gray-700">Loading...</p>
   </div>
 );
 
-// Main App Content with navigation
-const AppContent = () => {
-  const navigate = useNavigate();
-  
-  const handleLogout = useCallback(() => {
-    removeAuthToken();
-    removeUserInfo();
-    navigate('/login', { replace: true });
-  }, [navigate]);
-  
-  // Protected Route component with Navbar integration
-  const ProtectedRoute = ({ children }) => {
+// Protected Route component
+const ProtectedRoute = ({ children }) => {
     const [isChecking, setIsChecking] = useState(true);
     const [isAuth, setIsAuth] = useState(false);
 
     useEffect(() => {
-      const token = getAuthToken();
-      setIsAuth(!!token);
-      setIsChecking(false);
+        const token = getAuthToken();
+        console.log('Protected route checking token:', token ? 'Token exists' : 'No token');
+        setIsAuth(!!token);
+        setIsChecking(false);
     }, []);
 
     if (isChecking) {
-      return <LoadingScreen />;
+        return <LoadingScreen />;
     }
 
     if (!isAuth) {
-      return <Navigate to="/login" />;
+        console.log('Not authenticated, redirecting to login');
+        return <Navigate to="/login" />;
     }
 
+    console.log('Authenticated, rendering protected content');
     return (
-      <>
-        <Navbar onLogout={handleLogout} />
         <div className="pt-14 md:pt-16">
-          {children}
+            {children}
         </div>
-      </>
     );
-  };
+};
 
-  // Auth Route component (for login/register)
-  const AuthRoute = ({ children }) => {
+// Auth Route component (for login/register)
+const AuthRoute = ({ children }) => {
     const isAuthenticated = !!getAuthToken();
+    console.log('Auth route checking token:', isAuthenticated ? 'Token exists' : 'No token');
     
     if (isAuthenticated) {
-      return <Navigate to="/" />;
+        console.log('Already authenticated, redirecting to dashboard');
+        return <Navigate to="/dashboard" />;
     }
     
     return children;
-  };
-
-  return (
-    <Routes>
-      <Route 
-        path="/" 
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        } 
-      />
-      
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/profile/:username"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/find-friends"
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/login" 
-        element={
-          <AuthRoute>
-            <Login />
-          </AuthRoute>
-        } 
-      />
-      
-      <Route 
-        path="/signup" 
-        element={
-          <AuthRoute>
-            <Signup />
-          </AuthRoute>
-        } 
-      />
-
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
-  );
 };
 
 function App() {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<Navigate to="/login" />} />
+                <Route 
+                    path="/login" 
+                    element={
+                        <AuthRoute>
+                            <Login />
+                        </AuthRoute>
+                    } 
+                />
+                <Route 
+                    path="/signup" 
+                    element={
+                        <AuthRoute>
+                            <Signup />
+                        </AuthRoute>
+                    } 
+                />
+                <Route 
+                    path="/dashboard" 
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard />
+                        </ProtectedRoute>
+                    } 
+                />
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;
