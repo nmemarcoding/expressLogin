@@ -13,11 +13,11 @@ app.use(express.json());
 
 // CORS configuration - fixed to allow credentials with specific origin
 app.use(cors({
-  origin: 'http://localhost:3000', // Frontend origin
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['x-auth-token']
+    origin: ['http://192.168.1.17:3000', 'http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+    exposedHeaders: ['x-auth-token']
 }));
 
 // Connect to MongoDB
