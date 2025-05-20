@@ -21,7 +21,6 @@ const ProtectedRoute = ({ children }) => {
 
     useEffect(() => {
         const token = getAuthToken();
-        console.log('Protected route checking token:', token ? 'Token exists' : 'No token');
         setIsAuth(!!token);
         setIsChecking(false);
     }, []);
@@ -31,11 +30,9 @@ const ProtectedRoute = ({ children }) => {
     }
 
     if (!isAuth) {
-        console.log('Not authenticated, redirecting to login');
         return <Navigate to="/login" />;
     }
 
-    console.log('Authenticated, rendering protected content');
     return (
         <div className="pt-14 md:pt-16">
             {children}
@@ -46,10 +43,8 @@ const ProtectedRoute = ({ children }) => {
 // Auth Route component (for login/register)
 const AuthRoute = ({ children }) => {
     const isAuthenticated = !!getAuthToken();
-    console.log('Auth route checking token:', isAuthenticated ? 'Token exists' : 'No token');
     
     if (isAuthenticated) {
-        console.log('Already authenticated, redirecting to dashboard');
         return <Navigate to="/dashboard" />;
     }
     

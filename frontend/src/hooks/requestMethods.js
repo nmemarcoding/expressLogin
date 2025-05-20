@@ -7,14 +7,12 @@ const TOKEN_COOKIE_NAME = 'auth_token';
 // Function to set auth token in cookie
 export const setAuthToken = (token) => {
     if (!token) return;
-    console.log('Setting auth token:', token);
     Cookies.set(TOKEN_COOKIE_NAME, token, { expires: 7 }); // Cookie expires in 7 days
 };
 
 // Function to store user information in localStorage
 export const setUserInfo = (userData) => {
     if (!userData) return;
-    console.log('Setting user info:', userData);
   
     localStorage.setItem('user', JSON.stringify({
         id: userData.id || userData._id,
@@ -80,8 +78,6 @@ export const publicRequest = () => {
     // Modified response interceptor
     instance.interceptors.response.use(
         (response) => {
-            console.log('Response received:', response.data);
-            
             // Extract token from headers (case insensitive)
             const headers = response.headers;
             let token = 
@@ -91,7 +87,6 @@ export const publicRequest = () => {
                 response.data?.accessToken;
                 
             if (token) {
-                console.log('Received new token:', token);
                 setAuthToken(token);
                 
                 // If we have user data but no token in the response.data
@@ -102,11 +97,6 @@ export const publicRequest = () => {
             return response;
         },
         (error) => {
-            console.error('Request error:', error);
-            if (error.response) {
-                console.error('Error response data:', error.response.data);
-                console.error('Error response status:', error.response.status);
-            }
             if (error.response?.status === 401) {
                 removeAuthToken();
             }

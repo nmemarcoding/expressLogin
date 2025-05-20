@@ -63,11 +63,8 @@ const Login = () => {
         password: formData.password
       };
       
-      console.log('Sending login data:', loginData);
-      
       const request = publicRequest();
       const response = await request.post('/auth/login', loginData);
-      console.log('Login response:', response.data);
       
       // Check if we have a token either in the response data or from the interceptor
       let token = response.data.token;
@@ -88,7 +85,6 @@ const Login = () => {
       }
       
       if (token) {
-        console.log('Token received, setting auth and redirecting');
         setAuthToken(token);
         
         // Make sure we have user data before redirecting
@@ -98,7 +94,6 @@ const Login = () => {
           return;
         } else {
           // If we have a token but no user data, create minimal user object
-          console.log('Have token but no user data, using email as identifier');
           const defaultUser = {
             email: formData.email,
             username: formData.email.split('@')[0]
@@ -112,17 +107,12 @@ const Login = () => {
       // If we got here, something went wrong
       setGeneralError('Login failed. Please try again.');
     } catch (error) {
-      console.error('Login error:', error);
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-      }
       const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';
       setGeneralError(errorMessage);
       
       // Check if we might have a token despite the error
       const token = getAuthToken();
       if (token) {
-        console.log('Token found despite error. Trying to continue...');
         // Create minimal user object from form data
         const defaultUser = {
           email: formData.email,

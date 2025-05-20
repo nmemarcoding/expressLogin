@@ -171,11 +171,8 @@ const Signup = () => {
         lastName: formData.lastName
       };
       
-      console.log('Sending signup data:', requestData);
-      
       const request = publicRequest();
       const response = await request.post('/auth/register', requestData);
-      console.log('Signup response:', response.data);
       
       // Check if we have a token either in the response data or from the interceptor
       let token = response.data.token;
@@ -196,7 +193,6 @@ const Signup = () => {
       }
       
       if (token) {
-        console.log('Token received, setting auth and redirecting');
         setAuthToken(token);
         
         // Make sure we have user data before redirecting
@@ -206,7 +202,6 @@ const Signup = () => {
           return;
         } else {
           // If we have a token but no user data, try to get user data
-          console.log('Have token but no user data, using default user data');
           // Create minimal user object from form data
           const defaultUser = {
             username: formData.username,
@@ -223,17 +218,12 @@ const Signup = () => {
       // If we got here, something went wrong
       setGeneralError('Registration successful but login failed. Please try logging in.');
     } catch (error) {
-      console.error('Signup error:', error);
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-      }
       const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
       setGeneralError(errorMessage);
       
       // Check if we might have a token despite the error
       const token = getAuthToken();
       if (token) {
-        console.log('Token found despite error. Trying to continue...');
         // Create minimal user object from form data
         const defaultUser = {
           username: formData.username,
