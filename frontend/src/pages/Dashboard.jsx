@@ -1,28 +1,14 @@
 import React from 'react';
-import { getUserInfo, removeAuthToken, removeUserInfo } from '../hooks/requestMethods';
-import { useNavigate } from 'react-router-dom';
+import { getUserInfo } from '../hooks/requestMethods';
 
 const Dashboard = () => {
-  const navigate = useNavigate();
   const user = getUserInfo();
-  
-  const handleLogout = () => {
-    removeAuthToken();
-    removeUserInfo();
-    navigate('/login');
-  };
   
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6">
-        <div className="flex justify-between items-center mb-8">
+        <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-          <button 
-            onClick={handleLogout}
-            className="bg-transparent border border-indigo-600 text-indigo-600 hover:bg-indigo-50 focus:ring-indigo-300 font-medium py-2.5 px-4 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-opacity-50 flex justify-center items-center gap-2"
-          >
-            Logout
-          </button>
         </div>
         
         <div className="bg-indigo-50 rounded-lg p-6 mb-6">

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getAuthToken } from './hooks/requestMethods';
+import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
@@ -33,11 +34,7 @@ const ProtectedRoute = ({ children }) => {
         return <Navigate to="/login" />;
     }
 
-    return (
-        <div className="pt-14 md:pt-16">
-            {children}
-        </div>
-    );
+    return children;
 };
 
 // Auth Route component (for login/register)
@@ -54,33 +51,38 @@ const AuthRoute = ({ children }) => {
 function App() {
     return (
         <Router>
-            <Routes>
-                <Route path="/" element={<Navigate to="/login" />} />
-                <Route 
-                    path="/login" 
-                    element={
-                        <AuthRoute>
-                            <Login />
-                        </AuthRoute>
-                    } 
-                />
-                <Route 
-                    path="/signup" 
-                    element={
-                        <AuthRoute>
-                            <Signup />
-                        </AuthRoute>
-                    } 
-                />
-                <Route 
-                    path="/dashboard" 
-                    element={
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
-                    } 
-                />
-            </Routes>
+            <div className="min-h-screen bg-gray-50">
+                <Navbar />
+                <div className="pt-16"> {/* Add padding to prevent content from being hidden under navbar */}
+                    <Routes>
+                        <Route path="/" element={<Navigate to="/login" />} />
+                        <Route 
+                            path="/login" 
+                            element={
+                                <AuthRoute>
+                                    <Login />
+                                </AuthRoute>
+                            } 
+                        />
+                        <Route 
+                            path="/signup" 
+                            element={
+                                <AuthRoute>
+                                    <Signup />
+                                </AuthRoute>
+                            } 
+                        />
+                        <Route 
+                            path="/dashboard" 
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            } 
+                        />
+                    </Routes>
+                </div>
+            </div>
         </Router>
     );
 }
