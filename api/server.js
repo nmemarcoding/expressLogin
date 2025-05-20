@@ -11,14 +11,27 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// CORS configuration - fixed to allow credentials with specific origin
+// CORS configuration - allowing specific origins
 app.use(cors({
-    origin: ['http://192.168.1.17:3000', 'http://localhost:3000'],
+    origin: [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://192.168.1.17:3000', // Your local IP address
+        process.env.FRONTEND_URL, // Optional environment variable for production URL
+    ].filter(Boolean), // Filter out undefined values
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
     exposedHeaders: ['x-auth-token']
 }));
+
+// Add a route to check API status and get connection info
+app.get('/api/status', (req, res) => {
+    res.json({
+        status: 'API is running',
+        apiUrl: `${req.protocol}://${req.get('host')}/api`
+    });
+});
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
