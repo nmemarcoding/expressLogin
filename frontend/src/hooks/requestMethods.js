@@ -1,9 +1,11 @@
 import axios from "axios";
 import Cookies from 'js-cookie';
-import BASE_URL from './apiConfig';
 
-// Use the dynamically determined BASE_URL instead of hardcoded value
-// const BASE_URL = "http://localhost:6330/api/";
+// Get the current hostname (e.g., localhost, 192.168.1.17)
+const hostname = window.location.hostname;
+const API_PORT = '6330';
+const BASE_URL = `http://${hostname}:${API_PORT}/api/`;
+
 const TOKEN_COOKIE_NAME = 'auth_token';
 
 // Function to set auth token in cookie
@@ -55,7 +57,7 @@ export const publicRequest = () => {
     const token = getAuthToken();
     
     const instance = axios.create({
-        baseURL: BASE_URL, // Using the imported BASE_URL
+        baseURL: BASE_URL,
         withCredentials: true, // Keep credentials
         headers: {
             'Content-Type': 'application/json',
