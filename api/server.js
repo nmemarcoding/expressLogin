@@ -13,12 +13,7 @@ app.use(express.json());
 
 // CORS configuration - allowing specific origins
 app.use(cors({
-    origin: [
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        'http://192.168.1.17:3000', // Your local IP address
-        process.env.FRONTEND_URL, // Optional environment variable for production URL
-    ].filter(Boolean), // Filter out undefined values
+    origin: true, // Allow all origins
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
