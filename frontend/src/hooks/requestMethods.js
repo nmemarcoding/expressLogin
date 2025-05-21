@@ -1,112 +1,68 @@
 import axios from "axios";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
-// Get the current hostname (e.g., localhost, 192.168.1.17)
-const hostname = window.location.hostname;
-const API_PORT = '6330';
-const BASE_URL = `http://${hostname}:${API_PORT}/api/`;
+const BASE_URL = `http://${window.location.hostname}:6330/api/`;
+const TOKEN_KEY = 'auth_token';
 
-const TOKEN_COOKIE_NAME = 'auth_token';
+export const setAuthToken = (token) => token && Cookies.set(TOKEN_KEY, token, { expires: 7 });
+export const getAuthToken = () => Cookies.get(TOKEN_KEY);
+export const removeAuthToken = () => Cookies.remove(TOKEN_KEY);
 
-// Function to set auth token in cookie
-export const setAuthToken = (token) => {
-    if (!token) return;
-    Cookies.set(TOKEN_COOKIE_NAME, token, { expires: 7 }); // Cookie expires in 7 days
+export const setUserInfo = (user) => {
+  if (!user) return;
+  localStorage.setItem('user', JSON.stringify({
+    id: user.id || user._id,
+    username: user.username,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    profilePicture: user.profilePicture,
+    coverPhoto: user.coverPhoto,
+    bio: user.bio,
+  }));
 };
 
-// Function to store user information in localStorage
-export const setUserInfo = (userData) => {
-    if (!userData) return;
-  
-    localStorage.setItem('user', JSON.stringify({
-        id: userData.id || userData._id,
-        username: userData.username,
-        email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        profilePicture: userData.profilePicture,
-        coverPhoto: userData.coverPhoto,
-        bio: userData.bio
-    }));
-};
-
-// Function to get user information from localStorage
 export const getUserInfo = () => {
-    const userInfo = localStorage.getItem('user');
-    return userInfo ? JSON.parse(userInfo) : null;
+  const user = localStorage.getItem('user');
+  return user ? JSON.parse(user) : null;
 };
 
-// Function to remove user information from localStorage
-export const removeUserInfo = () => {
-    localStorage.removeItem('user');
-};
+export const removeUserInfo = () => localStorage.removeItem('user');
 
-// Function to get auth token from cookie
-export const getAuthToken = () => {
-    const token = Cookies.get(TOKEN_COOKIE_NAME);
-    return token;
-};
-
-// Function to remove auth token from cookie
-export const removeAuthToken = () => {
-    Cookies.remove(TOKEN_COOKIE_NAME);
-};
-
-// Modified publicRequest to use cookie-based token
 export const publicRequest = () => {
+  const instance = axios.create({
+    baseURL: BASE_URL,
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(getAuthToken() && {
+        Authorization: getAuthToken().startsWith('Bearer ') 
+          ? getAuthToken() 
+          : `Bearer ${getAuthToken()}`
+      })
+    }
+  });
+
+  instance.interceptors.request.use(config => {
     const token = getAuthToken();
-    
-    const instance = axios.create({
-        baseURL: BASE_URL,
-        withCredentials: true, // Keep credentials
-        headers: {
-            'Content-Type': 'application/json',
-            ...(token && { 'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}` })
-        }
-    });
+    if (token) config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    return config;
+  });
 
-    // Add request interceptor to always use the latest token
-    instance.interceptors.request.use(
-        (config) => {
-            const currentToken = getAuthToken();
-            if (currentToken && config.headers) {
-                config.headers.Authorization = currentToken.startsWith('Bearer ') 
-                    ? currentToken 
-                    : `Bearer ${currentToken}`;
-            }
-            return config;
-        },
-        (error) => Promise.reject(error)
-    );
+  instance.interceptors.response.use(
+    res => {
+      const token = res.headers['x-auth-token'] || res.headers['X-Auth-Token'] || res.data?.token || res.data?.accessToken;
+      if (token) {
+        setAuthToken(token);
+        res.data.token ??= token;
+      }
+      return res;
+    },
+    err => {
+      if (err.response?.status === 401) removeAuthToken();
+      return Promise.reject(err);
+    }
+  );
 
-    // Modified response interceptor
-    instance.interceptors.response.use(
-        (response) => {
-            // Extract token from headers (case insensitive)
-            const headers = response.headers;
-            let token = 
-                headers['x-auth-token'] || 
-                headers['X-Auth-Token'] || 
-                response.data?.token ||
-                response.data?.accessToken;
-                
-            if (token) {
-                setAuthToken(token);
-                
-                // If we have user data but no token in the response.data
-                if (!response.data.token && token) {
-                    response.data.token = token;
-                }
-            }
-            return response;
-        },
-        (error) => {
-            if (error.response?.status === 401) {
-                removeAuthToken();
-            }
-            return Promise.reject(error);
-        }
-    );
-
-    return instance;
+  return instance;
 };
